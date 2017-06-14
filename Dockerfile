@@ -1,22 +1,39 @@
 FROM php:5.6-alpine
 MAINTAINER solocommand
 
-RUN apk --update add apache2
-RUN apk add --no-cache $PHPIZE_DEPS openssl-dev php5-pear
+RUN apk --update add apache2 php5-apache2 $PHPIZE_DEPS openssl-dev php5-pear
+
+# mcrypt
+# RUN apk --update add libmcypt
+# RUN docker-php-ext-install mcrypt # Errors?
+
+# soap
+# RUN apk --update add libxml2
+# RUN docker-php-ext-install soap   # Errors?
+
+# imagick
+# RUN apk --update add imagemagick-dev imagemagick php5-imagick
+# RUN yes "" | pecl install imagick
 
 RUN yes "" | pecl install mongo-1.6.12 redis-2.2.5 igbinary
-RUN docker-php-ext-enable mongo redis igbinary
+RUN docker-php-ext-install opcache mysqli zip
+RUN docker-php-ext-enable mongo redis igbinary opcache mysqli zip
 
-RUN sed -i 's/#LoadModule\ rewrite_module/LoadModule\ rewrite_module/' /etc/apache2/httpd.conf
-RUN sed -i 's/#LoadModule\ deflate_module/LoadModule\ deflate_module/' /etc/apache2/httpd.conf
-RUN sed -i 's/#LoadModule\ expires_module/LoadModule\ expires_module/' /etc/apache2/httpd.conf
+RUN sed -i "s#/app/#/app/$WEBAPP_ROOT#" /etc/apache2/httpd.conf
 
-RUN sed -i "s#^DocumentRoot \".*#DocumentRoot \"/app/$WEBAPP_ROOT\"#g" /etc/apache2/httpd.conf
-RUN sed -i "s#/var/www/localhost/htdocs#/app/$WEBAPP_ROOT#" /etc/apache2/httpd.conf
-RUN printf "\n<Directory \"/app/$WEBAPP_ROOT\">\n\tAllowOverride All\n</Directory>\n" >> /etc/apache2/httpd.conf
+COPY files/httpd.conf /etc/apache2/httpd.conf
+COPY files/php.ini /usr/local/etc/php/php.ini
+
+RUN mkdir /run/apache2
+RUN ln -sfT /dev/stderr /var/www/logs/error.log && ln -sfT /dev/stdout /var/www/logs/access.log
+
+# RUN echo "*/app/logs/*\n*/var/logs/*" > /etc/opcache.blacklist
+
+ENV PHP_INI_SCAN_DIR /usr/local/etc/php/conf.d
 
 WORKDIR /app
-
 EXPOSE 80
-ENTRYPOINT ["httpd", "-DFOREGROUND"]
-CMD ["-DFOREGROUND"]
+CMD ["httpd", "-DFOREGROUND"]
+
+# COPY files/test.php /app/test.php
+# COPY files/status.conf /etc/apache2/conf.d/status.conf
