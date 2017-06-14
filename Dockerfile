@@ -27,7 +27,7 @@ COPY files/php.ini /usr/local/etc/php/php.ini
 RUN mkdir /run/apache2
 RUN ln -sfT /dev/stderr /var/www/logs/error.log && ln -sfT /dev/stdout /var/www/logs/access.log
 
-# RUN echo "*/app/logs/*\n*/var/logs/*" > /etc/opcache.blacklist
+RUN echo "*/app/logs/*\n*/var/logs/*" > /etc/opcache.blacklist
 
 ENV PHP_INI_SCAN_DIR /usr/local/etc/php/conf.d
 
