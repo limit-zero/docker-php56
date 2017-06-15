@@ -9,7 +9,7 @@ mkdir -p /run/apache2
 
 # bind stdout/stdin
 ln -sfT /dev/stderr /var/www/logs/error.log
-ln -sfT /dev/stdout /var/www/logs/access.log
+# ln -sfT /dev/stdout /var/www/logs/access.log
 
 # opcache defaults
 echo "*/app/logs/*\n*/var/logs/*" > /etc/opcache.blacklist
@@ -19,6 +19,6 @@ export PHP_INI_SCAN_DIR=/usr/local/etc/php/conf.d
 
 # Set web root
 echo -e "\033[92mUsing \"/app/${WEBAPP_ROOT}\" as apache root directory!\033[0m"
-sed -i "s#/app/#/app/${WEBAPP_ROOT}#" /etc/apache2/httpd.conf
+sed -i "s#\"/app/\"#\"/app/${WEBAPP_ROOT}\"#" /etc/apache2/httpd.conf
 
 exec httpd -DFOREGROUND
