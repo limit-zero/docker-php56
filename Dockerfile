@@ -40,22 +40,14 @@ RUN docker-php-ext-enable \
 
 COPY files/httpd.conf /etc/apache2/httpd.conf
 COPY files/php.ini /usr/local/etc/php/php.ini
-
-RUN mkdir /run/apache2
-RUN ln -sfT /dev/stderr /var/www/logs/error.log && ln -sfT /dev/stdout /var/www/logs/access.log
-
-RUN echo "*/app/logs/*\n*/var/logs/*" > /etc/opcache.blacklist
-
-ENV PHP_INI_SCAN_DIR /usr/local/etc/php/conf.d
+COPY files/apache2-foreground /usr/local/bin/
 
 WORKDIR /app
 EXPOSE 80
-CMD ["httpd", "-DFOREGROUND"]
 
-ARG WEBAPP_ROOT
-ENV WEBAPP_ROOT ${WEBAPP_ROOT}
+ENTRYPOINT 'apache2-foreground'
+CMD 'apache2-foreground'
 
-RUN sed -i "s#/app/#/app/${WEBAPP_ROOT}#" /etc/apache2/httpd.conf
-
+# ENV WEBAPP_ROOT web
 # COPY files/test.php /app/test.php
 # COPY files/status.conf /etc/apache2/conf.d/status.conf
