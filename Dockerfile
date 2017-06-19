@@ -1,6 +1,8 @@
 FROM php:5.6-apache
 MAINTAINER solocommand
 
+RUN apt-get update && apt-get install -y zip
+
 # mcrypt
 # RUN apk --update add libmcypt
 # RUN docker-php-ext-install mcrypt # Errors?
@@ -13,6 +15,7 @@ MAINTAINER solocommand
 # RUN apk --update add imagemagick-dev imagemagick php5-imagick
 # RUN yes "" | pecl install imagick
 
+
 RUN apt-get update \
   && apt-get install -y libssl-dev
 
@@ -24,6 +27,8 @@ RUN yes "" | pecl install redis-2.2.5 \
 
 RUN yes "" | pecl install igbinary-2.0.1 \
   && docker-php-ext-enable igbinary
+
+RUN a2enmod rewrite
 
 # COPY conf/vhost.conf /etc/apache2/sites-available/000-default.conf
 # COPY conf/php.ini /usr/local/etc/php/php.ini
