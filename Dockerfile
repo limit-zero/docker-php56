@@ -1,7 +1,8 @@
 FROM php:5.6-apache
 MAINTAINER solocommand
 
-RUN apt-get update && apt-get install -y zip
+RUN apt-get update && apt-get install -y git \
+  zip
 
 # mcrypt
 # RUN apk --update add libmcypt
@@ -30,8 +31,11 @@ RUN yes "" | pecl install igbinary-2.0.1 \
 
 RUN a2enmod rewrite
 
-# COPY conf/vhost.conf /etc/apache2/sites-available/000-default.conf
-# COPY conf/php.ini /usr/local/etc/php/php.ini
+RUN docker-php-ext-install zip
+
+COPY files/vhost.conf /etc/apache2/sites-available/000-default.conf
+COPY files/php.ini /usr/local/etc/php/php.ini
+# RUN echo "<?php phpinfo();" > /var/www/html/index.php
 # COPY app /var/www/html
 # RUN chown -R www-data:www-data var && chmod -R 0755 var
 # ENV APP_ENV prod
