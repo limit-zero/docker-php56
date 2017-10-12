@@ -2,15 +2,15 @@ FROM php:5.6-apache
 MAINTAINER solocommand
 
 RUN apt-get update && apt-get install -y git \
-  zip
+  zip \
+  libxml2-dev
 
 # mcrypt
 # RUN apk --update add libmcypt
 # RUN docker-php-ext-install mcrypt # Errors?
 
-# soap
-# RUN apk --update add libxml2
-# RUN docker-php-ext-install soap   # Errors?
+RUN docker-php-ext-install soap \
+  && docker-php-ext-enable soap
 
 # imagick
 # RUN apk --update add imagemagick-dev imagemagick php5-imagick
